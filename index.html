@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تطبيق المسبحة الإلكترونية</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            width: 90%;
+            max-width: 400px;
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #d4af37;
+        }
+        .dhikr-select {
+            margin-bottom: 20px;
+        }
+        select {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+            background: #fff;
+            color: #333;
+            width: 100%;
+            text-align: center;
+            cursor: pointer;
+        }
+        .counter-box {
+            margin: 30px 0;
+        }
+        .counter {
+            font-size: 70px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+        .btn-tasbih {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #d4af37, #aa771c);
+            border: none;
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+            transition: transform 0.1s, background 0.2s;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-tasbih:active {
+            transform: scale(0.95);
+        }
+        .actions {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .btn-reset, .btn-total-reset {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-reset {
+            background: #e74c3c;
+            color: white;
+        }
+        .btn-total-reset {
+            background: #7f8c8d;
+            color: white;
+        }
+        .total {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        /* تنسيق الخانة العائمة (الزر العائم) */
+        .floating-box {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(212, 175, 55, 0.2);
+            backdrop-filter: blur(12px);
+            border: 2px solid #d4af37;
+            padding: 10px 25px;
+            border-radius: 30px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .floating-box:active {
+            transform: translateX(-50%) scale(0.95);
+            background: rgba(212, 175, 55, 0.4);
+        }
+        .floating-text {
+            font-size: 16px;
+            font-weight: bold;
+            color: #d4af37;
+        }
+        .floating-count {
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+            background: #d4af37;
+            padding: 2px 12px;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>المسبحة الإلكترونية</h1>
+        
+        <div class="dhikr-select">
+            <select id="dhikrType" onchange="resetCounter()">
+                <option value="سبحان الله">سبحان الله</option>
+                <option value="الحمد لله">الحمد لله</option>
+                <option value="الله أكبر">الله أكبر</option>
+                <option value="لا إله إلا الله">لا إله إلا الله</option>
+                <option value="استغفر الله">استغفر الله</option>
+            </select>
+        </div>
+
+        <div class="counter-box">
+            <div class="counter" id="counter">0</div>
+            <div class="total" id="totalText">المجموع الكلي: 0</div>
+        </div>
+
+        <button class="btn-tasbih" onclick="increment()">تسبيح</button>
+
+        <div class="actions">
+            <button class="btn-reset" onclick="resetCounter()">تصفير العداد</button>
+            <button class="btn-total-reset" onclick="resetTotal()">تصفير الكل</button>
+        </div>
+    </div>
+
+    <!-- الخانة العائمة أسفل الشاشة -->
+    <div class="floating-box" onclick="increment()">
+        <span class="floating-text">تسبيح سريع</span>
+        <span class="floating-count" id="floatingCount">0</span>
+    </div>
+
+    <script>
+        let count = 0;
+        let total = 0;
+        
+        const counterEl = document.getElementById('counter');
+        const floatingCountEl = document.getElementById('floatingCount');
+        const totalTextEl = document.getElementById('totalText');
+
+        function increment() {
+            count++;
+            total++;
+            counterEl.innerText = count;
+            floatingCountEl.innerText = count;
+            totalTextEl.innerText = "المجموع الكلي: " + total;
+            
+            // اهتزاز خفيف عند الضغط (يعمل على الهواتف الذكية)
+            if (navigator.vibrate) {
+                navigator.vibrate(40);
+            }
+        }
+
+        function resetCounter() {
+            count = 0;
+            counterEl.innerText = count;
+            floatingCountEl.innerText = count;
+        }
+
+        function resetTotal() {
+            count = 0;
+            total = 0;
+            counterEl.innerText = count;
+            floatingCountEl.innerText = count;
+            totalTextEl.innerText = "المجموع الكلي: 0";
+        }
+    </script>
+</body>
+</html>
